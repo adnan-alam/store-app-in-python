@@ -1,4 +1,6 @@
 # concept and coding idea is from the book "Programminger Bolod To Boss" -by Jhankar Mahbub
+# http://habluderadda.com/concepts/app/storeManager.html
+
 # implemented and modified in python 3 by me(Adnan Alam)
 
 
@@ -11,12 +13,16 @@ class Store:
         self.items = []
         self.prices = {}
         self.stock = {}
+        self.discounts = {}
         self.totalSales = 0
     
     
-    def addItem(self,name,quantity,price=None):
+    def addItem(self,name,quantity,price=None,discount=None):
         
         isAvailable = self.isItemAvailable(name)
+        
+        if discount is not None:
+            self.discounts[name] = discount
         
         if isAvailable == True:
             self.stock[name] += quantity
@@ -54,15 +60,30 @@ class Store:
 
             if available < quantity:
                 print("We don't have enough.") 
+                
             else:
-                itemPrice = self.getPrice(name)
-                currentSale = itemPrice * quantity
-                self.totalSales += currentSale
-                self.stock[name] -= quantity
+                
+                if name in self.discounts.keys():
+                    discount = self.discounts[name]
+                    itemPrice = self.getPrice(name) 
+                    totalDiscount = itemPrice * discount
+                    currentSale = (itemPrice-totalDiscount) * quantity
+                    self.totalSales += currentSale
+                    self.stock[name] -= quantity
+                    print("Total Discount: {}".format(totalDiscount))
+                    
+                else:
+                    itemPrice = self.getPrice(name)
+                    currentSale = itemPrice * quantity
+                    self.totalSales += currentSale
+                    self.stock[name] -= quantity
+                    
+            print("Total Price: {}".format(currentSale))
+            
         else:
             print("We don't have this item.") 
             
-
+    
     
     def getStock(self):
         
@@ -84,6 +105,3 @@ class Store:
     def getTotalSales(self):
         
         print("Total Sales: {}".format(self.totalSales))
-
-
-my_store = Store("Store's name goes here")
